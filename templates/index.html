@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">QRGen</div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#generate">Generate</a></li>
+            <li><a href="#footer">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <h1>Welcome to QR Code Generator</h1>
+        <p>Create custom QR codes instantly from any URL</p>
+        <a href="#generate" class="btn-primary">Get Started</a>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container" id="generate">
+        <h2>Generate Your QR Code</h2>
+        <form id="qrForm">
+            <label for="url">Enter URL:</label>
+            <input type="text" id="url" name="url" required placeholder="https://example.com">
+            <button type="submit">Generate QR Code</button>
+        </form>
+        <div id="qrResult">
+            <img id="qrImage" src="" alt="QR Code" style="display: none; ">
+            <br>
+            <a id="downloadBtn" href="#" download="qr_code.png" style="display: none;">
+                <button type="button">Download QR Code</button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <p>© 2025 QRGen. All rights reserved.</p>
+        <p>Made with ❤️ by Raj</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.getElementById("qrForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            let url = document.getElementById("url").value;
+            
+            if (!url) {
+                alert("Please enter a valid URL.");
+                return;
+            }
+
+            let response = await fetch("/generate_qr", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url: url })
+            });
+
+            let data = await response.json();
+            if (data.success) {
+                let qrImage = document.getElementById("qrImage");
+                qrImage.src = data.qr_code;
+                qrImage.style.display = "block";
+
+                let downloadBtn = document.getElementById("downloadBtn");
+                downloadBtn.href = data.qr_code;
+                downloadBtn.style.display = "inline-block";
+            } else {
+                alert("Error generating QR Code.");
+            }
+        });
+    </script>
+</body>
+</html>
